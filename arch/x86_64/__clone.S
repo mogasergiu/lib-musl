@@ -23,7 +23,13 @@ __clone:
 	/* flags */
 	movq	%rdx, %rdi
 
-	/* stack is already in rsi */
+	/* stack is already in rsi, but we must align it for now due to
+	 * a TLS size/alignment bug we have. Musl uses the TLS size to
+	 * to make some room on the stack for the child and if the TLS size
+	 * is not stack-aligned, subtracting it from the child stack
+	 * will result in a misaligned stack
+	 */
+	andq	$~0xf, %rsi
 
 	/* parent_tid */
 	movq	%r8, %rdx
